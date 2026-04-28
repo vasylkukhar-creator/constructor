@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FABU Creative Constructor</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', 'Helvetica Neue', sans-serif; background: #0D0B14; color: #E8E6F0; min-height: 100vh; padding: 24px 20px; }
+  .wrap { max-width: 800px; margin: 0 auto; }
+  .logo { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; color: #6C5CE7; text-transform: uppercase; margin-bottom: 6px; }
+  h1 { font-size: 28px; font-weight: 700; line-height: 1.2; }
+  .subtitle { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 6px; margin-bottom: 36px; }
+  .section { margin-bottom: 32px; }
+  .label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.4); margin-bottom: 12px; display: block; }
+  .grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .col { display: flex; flex-direction: column; gap: 6px; }
+
+  .chip {
+    padding: 9px 15px; border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.55); cursor: pointer;
+    font-size: 13px; font-weight: 400; transition: all 0.15s; line-height: 1.4;
+    text-align: left; font-family: inherit;
+  }
+  .chip:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); }
+  .chip.sel-purple { border-color: #6C5CE7; background: rgba(108,92,231,0.1); color: #B8B0F0; font-weight: 600; }
+  .chip.sel-red { border-color: #E17055; background: rgba(225,112,85,0.1); color: #F0A090; font-weight: 600; }
+  .chip.sel-green { border-color: #00B894; background: rgba(0,184,148,0.1); color: #80DCC8; font-weight: 600; }
+  .chip.sel-danger { border-color: #D63031; background: rgba(214,48,49,0.1); color: #F08080; font-weight: 600; }
+  .chip.sel-yellow { border-color: #FDCB6E; background: rgba(253,203,110,0.1); color: #FDE8A0; font-weight: 600; }
+  .chip.sel-blue { border-color: #A29BFE; background: rgba(162,155,254,0.1); color: #C8C4FE; font-weight: 600; }
+  .chip.sel-teal { border-color: #00CEC9; background: rgba(0,206,201,0.1); color: #80E8E5; font-weight: 600; }
+  .chip-sub { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+  .chip strong { font-weight: 600; }
+
+  .arch-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-start; }
+  .arch-col { flex: 1; min-width: 280px; }
+  .arch-arrow { font-size: 22px; color: rgba(255,255,255,0.15); padding-top: 24px; }
+  .arch-label { font-size: 10px; color: rgba(255,255,255,0.3); margin-bottom: 6px; }
+  .combo-note { margin-top: 10px; padding: 7px 14px; border-radius: 6px; font-size: 12px; line-height: 1.4; }
+  .combo-green { background: rgba(0,184,148,0.08); color: #00B894; }
+  .combo-orange { background: rgba(255,183,77,0.08); color: #FFB74D; }
+
+  .btn-generate {
+    width: 100%; padding: 15px 24px; border-radius: 10px; border: none;
+    font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    font-family: inherit; margin-bottom: 32px;
+  }
+  .btn-generate.active { background: linear-gradient(135deg, #6C5CE7, #A29BFE); color: #fff; }
+  .btn-generate.active:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(108,92,231,0.3); }
+  .btn-generate.disabled { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.2); cursor: not-allowed; }
+
+  .storyboard { background: rgba(255,255,255,0.025); border-radius: 14px; border: 1px solid rgba(255,255,255,0.07); overflow: hidden; margin-bottom: 24px; }
+  .sb-header { padding: 18px 22px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center; }
+  .sb-title { font-size: 16px; font-weight: 700; }
+  .sb-meta { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 3px; }
+  .btn-copy { padding: 7px 16px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: #A29BFE; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .btn-copy:hover { background: rgba(162,155,254,0.1); }
+  .btn-copy.copied { color: #00B894; border-color: #00B894; }
+
+  .sb-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .sb-table th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.3); border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .sb-table td { padding: 11px 14px; border-bottom: 1px solid rgba(255,255,255,0.035); vertical-align: top; line-height: 1.55; }
+  .sb-table tr:last-child td { border-bottom: none; }
+  .td-num { color: rgba(255,255,255,0.25); font-size: 11px; width: 30px; }
+  .td-block { font-weight: 600; white-space: nowrap; font-size: 12px; }
+  .td-time { color: rgba(255,255,255,0.45); font-size: 12px; white-space: nowrap; }
+  .td-vo { max-width: 260px; }
+  .td-visual { max-width: 240px; color: rgba(255,255,255,0.55); }
+  .td-sound { color: rgba(255,255,255,0.35); font-size: 12px; }
+  .row-cta { background: rgba(108,92,231,0.07); }
+  .row-hook { background: rgba(253,203,110,0.05); }
+  .row-pain { background: rgba(225,112,85,0.04); }
+  .row-turn { background: rgba(0,184,148,0.05); }
+  .row-result { background: rgba(0,206,201,0.03); }
+  .row-soft { background: rgba(255,255,255,0.01); }
+
+  .endcard-bar { padding: 16px 22px; border-top: 1px solid rgba(255,255,255,0.06); background: rgba(162,155,254,0.04); }
+  .endcard-label { font-size: 11px; font-weight: 600; color: #A29BFE; margin-bottom: 4px; }
+  .checklist-bar { padding: 16px 22px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 12px; color: rgba(255,255,255,0.3); line-height: 1.7; }
+  .checklist-bar strong { color: rgba(255,255,255,0.5); }
+
+  @media (max-width: 600px) {
+    body { padding: 16px 12px; }
+    h1 { font-size: 22px; }
+    .sb-table { font-size: 12px; }
+    .sb-table th, .sb-table td { padding: 8px 10px; }
+    .td-vo, .td-visual { max-width: 160px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+const FORMATS = [
+  { id:"blobby", name:"Animated Blobby", icon:"🎨", desc:"2D cartoon трансформація, камінь/якір", rating:4 },
+  { id:"spirit", name:"Spirit Animal + розклад", icon:"🦌", desc:"Жінка + тварина, тижневий план", rating:4 },
+  { id:"sketch", name:"Sketch Drama", icon:"✏️", desc:"B&W → колір, кінематографічний", rating:5 },
+  { id:"symptom", name:"Symptom List", icon:"📋", desc:"Список симптомів → FABU рішення", rating:5 },
+  { id:"match", name:"Perfect Match", icon:"💑", desc:"3D Pixar пари архетипів", rating:4 },
+  { id:"runway", name:"Archetype Runway", icon:"👗", desc:"Pixar каталог як модний показ", rating:5 },
+  { id:"cards", name:"Wrong/Right Cards", icon:"🃏", desc:"Pixar split wrong vs right routine", rating:4 },
+];
+
+const PAINS = [
+  { id:"invisible", name:"Невидима в шлюбі", emoji:"👻", ex:["husband didn't notice me","cold and distant marriage","burnout at work"] },
+  { id:"sexless", name:"Холодний шлюб", emoji:"🥶", ex:["sexless marriage for 10 years","forgot the last time we had intimacy","career stalled completely"] },
+  { id:"procrastination", name:"Прокрастинація / freeze", emoji:"🧊", ex:["couldn't wash a single dish","email sat unanswered for 11 days","avoiding every simple task"] },
+  { id:"burnout", name:"Вигорання / тривога", emoji:"🔥", ex:["career was a cycle of pure burnout","body shaking at night","no energy in the morning"] },
+  { id:"scrolling", name:"Doom-scrolling", emoji:"📱", ex:["stuck scrolling every night","mobile games turned my marriage cold","screen addiction made me unattractive"] },
+  { id:"dysthymia", name:"Дистимія", emoji:"🌫️", ex:["waking up tired every day","stopped seeing friends","tomorrow never came"] },
+  { id:"weight", name:"Зайва вага / заїдання", emoji:"🍕", ex:["routine forcing dopamine from food","emotional eating every night","gaining weight I can't stop"] },
+  { id:"age45", name:"Зміни після 45", emoji:"⏳", ex:["became invisible to husband after 45","age-related changes nobody warned me about","constant irritability and anxiety"] },
+  { id:"trauma", name:"Дитяча травма", emoji:"🧸", ex:["childhood trauma shaped all my patterns","oversharing is actually a trauma response","parent was living the wrong archetype too"] },
+];
+
+const ARCHETYPES = [
+  { id:"queen", name:"The Queen", alt:"The Boss" },
+  { id:"huntress", name:"The Huntress", alt:"The Huntress" },
+  { id:"mother", name:"The Mother", alt:"The Mother" },
+  { id:"rebel", name:"The Rebel", alt:"The Rebel" },
+  { id:"lover", name:"The Lover", alt:"The Bombshell" },
+  { id:"deer", name:"The Deer", alt:"The Dreamer" },
+  { id:"phoenix", name:"The Phoenix", alt:"The Phoenix" },
+  { id:"creator", name:"The Creator", alt:"The Creator" },
+];
+
+const COMBOS = [
+  { from:"queen", to:"mother", st:"✅ top winner", note:"Ключова пара, ~1000 покупок по $65" },
+  { from:"huntress", to:"deer", st:"✅", note:"Ціль → тривога" },
+  { from:"phoenix", to:"mother", st:"✅", note:"Трансформація → самопожертва" },
+  { from:"huntress", to:"mother", st:"✅", note:"Відпрацьовано" },
+  { from:"creator", to:"mother", st:"✅", note:"Відпрацьовано" },
+  { from:"queen", to:"rebel", st:"✅", note:"Відпрацьовано" },
+  { from:"rebel", to:"lover", st:"⬜ біла пляма", note:"Свобода → залежність — НЕ відпрацьовано, пріоритет" },
+  { from:"creator", to:"deer", st:"⬜ біла пляма", note:"Творчість → параліч тривоги — НЕ відпрацьовано, пріоритет" },
+];
+
+const HOOKS = {
+  result: { label:"🎯 Результат того ж дня", items:[
+    "A random stranger asked me out the very day I started my archetype routine",
+    "My husband couldn't keep his hands off me after I started my archetype routine",
+    "Men didn't notice me until I started living by my spirit animal's schedule",
+    "My husband said, 'You're glowing — what changed?'",
+  ]},
+  shock: { label:"⚡ Шок / провокація", items:[
+    "Living the wrong archetype made me invisible in my own marriage",
+    "I was drowning in an archetype that wasn't mine for 35 years",
+    "The wrong archetype buried me alive",
+    "The wrong archetype killed my libido",
+    "I was drowning in a routine that wasn't mine for 47 years",
+  ]},
+  diagnosis: { label:"🩺 Діагноз", items:[
+    "Dysthymia signs people ignore",
+    "Dysthymia: The Thief That Steals You While You're Still Alive",
+    "Signs your nervous system is running someone else's program",
+  ]},
+  question: { label:"❓ Едукаційне питання (CTR 2.6%)", items:[
+    "Did you know that not understanding your archetype can affect your family life?",
+    "Did you know the wrong archetype routine could be the cause of your daily family issues?",
+    "Do you know that the wrong archetype routine makes you feel unwanted in your marriage?",
+  ]},
+  insight: { label:"💡 Інсайт після факту", items:[
+    "After taking the archetype test, I realized I love my husband not for who he is, but for who I become when I'm with him",
+    "I cried when I realized I'd spent my whole life on the wrong archetype",
+    "At 65 years old, my biggest regret is living the wrong archetype",
+  ]},
+  paradox: { label:"🔄 Парадокс", items:[
+    "I saved myself when I discovered my true archetype",
+    "I saved my family the moment I discovered my true archetype",
+    "I stopped trying to be productive. And finally got things done.",
+  ]},
+};
+
+const ENDCARDS = [
+  { id:"illusion", name:"Оптична ілюзія + Quiz", ctr:"12%+", desc:"What do you see first? Lion/Trees, Elephant/Moon — самодостатній" },
+  { id:"archetype_quiz", name:"Архетип Quiz", ctr:"~3-5%", desc:"What archetype lives within you? + кнопки архетипів + START QUIZ" },
+  { id:"routine_cta", name:"Рутинний CTA", ctr:"~2-3%", desc:"Get your personalized weekly anti-stress archetype routine!" },
+  { id:"simple", name:"Simple FABU CTA", ctr:"~2%", desc:"FABU — Take the quiz and let the change begin" },
+];
+
+const CTAS = [
+  "Take the free test",
+  "Take the quiz",
+  "Find your archetype. Free.",
+  "Take the test now and reset your life according to who you really are",
+  "Let the change start on its own",
+  "Stop carrying someone else's ARCHETYPE on your shoulders!",
+];
+
+const PLACEMENTS = [
+  { id:"rewarded", name:"Applovin Rewarded", dur:"30s", hook:"Фінал (27-30с)", note:"Хук в КІНЦІ. М'який вхід." },
+  { id:"rewarded45", name:"Applovin Rewarded 45s", dur:"45s", hook:"Фінал (40-45с)", note:"Тільки для Spirit Animal / routine" },
+  { id:"interstitial", name:"Applovin Interstitial", dur:"12-15s", hook:"Початок (0-3с)", note:"Як Meta. Сильний хук одразу." },
+  { id:"meta", name:"Meta Ads", dur:"15-30s", hook:"Початок (0-3с)", note:"Sound-off. Subtitle-first." },
+];
+
+// STATE
+let state = { format:null, pain:null, archFrom:null, archTo:null, hookType:null, selectedHook:null, placement:"rewarded", endcard:"illusion", cta:CTAS[0], showResult:false };
+
+function set(key, val) { state[key] = val; state.showResult = false; render(); }
+function toggle(key, val) { state[key] = state[key] === val ? null : val; state.showResult = false; render(); }
+
+function generateStoryboard() {
+  const s = state;
+  const painData = PAINS.find(p => p.id === s.pain);
+  const fromA = ARCHETYPES.find(a => a.id === s.archFrom);
+  const toA = ARCHETYPES.find(a => a.id === s.archTo);
+  const isR = s.placement === "rewarded" || s.placement === "rewarded45";
+  const is45 = s.placement === "rewarded45";
+  const ex = painData ? painData.ex : ["chaos at home","cold marriage","burnout at work"];
+
+  const reframe = fromA && toA
+    ? `I am ${fromA.name.toUpperCase()}, but I was living as ${toA.name.toUpperCase()}.`
+    : "I'm not broken — I just didn't know my system.";
+
+  let b = [];
+  if (isR) b.push({ cls:"row-soft", block:"М'який вхід", time: "0–5с", vo:"(Тиша або ambient. Юзер зонований — не витрачати хук.)", visual:"Спокійна ранкова сцена. Жінка, втома, рутина.", sound:"Ambient pad" });
+
+  b.push({ cls:"row-hook", block: isR ? "М'який хук" : "🔥 ХУК", time: isR ? "5–8с" : "0–3с", vo: s.selectedHook || "—", visual: isR ? "Текст з'являється поступово. Без агресії." : "THUMB-STOP! Найсильніший перший кадр.", sound: isR ? "Музика починається" : "Strong sting" });
+
+  const t1 = isR ? (is45 ? ["8–13с","13–18с","18–23с"] : ["8–12с","12–16с","16–19с"]) : ["3–6с","6–9с","9–12с"];
+  b.push({ cls:"row-pain", block:"Біль — Дім", time:t1[0], vo:`My home: ${ex[0]}.`, visual:"Конкретна сцена хаосу вдома. Деталі!", sound:"Музика росте" });
+  b.push({ cls:"row-pain", block:"Біль — Стосунки", time:t1[1], vo:`My marriage: ${ex[1]}.`, visual:"Пара — дистанція, холод, відчуження.", sound:"Tension builds" });
+  b.push({ cls:"row-pain", block:"Біль — Робота/тіло", time:t1[2], vo:`My body: ${ex[2]}.`, visual:"Виснаження, прокрастинація, втома.", sound:"Peak tension" });
+
+  const t2 = isR ? (is45 ? "23–30с" : "19–23с") : "12–14с";
+  b.push({ cls:"row-turn", block:"Поворот / FABU", time:t2, vo:`Then I took the FABU archetype test. ${reframe}`, visual:"Телефон → тест → результат архетипу → план генерується. B&W→колір.", sound:"Minor → major shift" });
+
+  const t3 = isR ? (is45 ? ["30–34с","34–38с","38–41с"] : ["23–25с","25–27с","27–28с"]) : ["—","—","—"];
+  if (!(!isR && s.placement === "interstitial")) {
+    b.push({ cls:"row-result", block:"Результат — Дім", time:t3[0], vo:"My home began to glow with cleanliness and comfort.", visual:"Дім сяє. Порядок, затишок, світло.", sound:"Bright, hopeful" });
+    b.push({ cls:"row-result", block:"Результат — Стосунки", time:t3[1], vo:"My husband saw the woman in me again.", visual:"Пара — близькість, тепло, дотики.", sound:"Music peaks" });
+    b.push({ cls:"row-result", block:"Результат — Робота", time:t3[2], vo:"I even got a promotion at work.", visual:"Енергія, впевненість, досягнення.", sound:"Music holds" });
+  }
+
+  const tCta = isR ? (is45 ? "41–45с" : "28–30с") : "14–15с";
+  b.push({ cls:"row-cta", block: isR ? "🔥 ПІК CTA" : "CTA", time:tCta, vo: s.cta, visual:"Найяскравіший кадр! FABU quiz + burn-in CTA.", sound:"Drum hit / stinger" });
+
+  return b;
+}
+
+function copyStoryboard() {
+  const sb = generateStoryboard();
+  const fmt = FORMATS.find(f => f.id === state.format);
+  const pn = PAINS.find(p => p.id === state.pain);
+  const pl = PLACEMENTS.find(p => p.id === state.placement);
+  const ec = ENDCARDS.find(e => e.id === state.endcard);
+  const fromA = ARCHETYPES.find(a => a.id === state.archFrom);
+  const toA = ARCHETYPES.find(a => a.id === state.archTo);
+
+  let txt = `FABU CREATIVE STORYBOARD\n`;
+  txt += `========================\n\n`;
+  txt += `Формат: ${fmt?.icon} ${fmt?.name}\n`;
+  txt += `Pain: ${pn?.emoji} ${pn?.name}\n`;
+  txt += `Платформа: ${pl?.name} (${pl?.dur})\n`;
+  if (fromA && toA) txt += `Архетип: ${fromA.name} → ${toA.name}\n`;
+  txt += `End Card: ${ec?.name} (CTR ${ec?.ctr})\n`;
+  txt += `\n---\n\n`;
+  txt += `# | Блок | Час | VO | Що в кадрі | Звук\n`;
+  sb.forEach((r, i) => {
+    txt += `${i+1} | ${r.block} | ${r.time} | ${r.vo} | ${r.visual} | ${r.sound}\n`;
+  });
+  txt += `\n---\n\nEnd Card: ${ec?.name} — ${ec?.desc}\n`;
+  txt += `\nЧеклист: 9:16 .mp4 ≤2MB · Субтитри burn-in · CTA в кадрі · End card обов'язковий`;
+
+  navigator.clipboard.writeText(txt).then(() => {
+    document.getElementById('copyBtn').textContent = '✅ Скопійовано!';
+    document.getElementById('copyBtn').classList.add('copied');
+    setTimeout(() => { document.getElementById('copyBtn').textContent = '📋 Копіювати бриф'; document.getElementById('copyBtn').classList.remove('copied'); }, 2000);
+  });
+}
+
+function chips(items, selKey, selClass, renderFn) {
+  return items.map((item, i) => {
+    const id = typeof item === 'string' ? item : item.id;
+    const isSel = state[selKey] === id;
+    return `<button class="chip ${isSel ? selClass : ''}" onclick="${typeof item === 'string' ? `set('${selKey}','${id.replace(/'/g,"\\'")}')` : `toggle('${selKey}','${id}')`}">${renderFn(item, isSel)}</button>`;
+  }).join('');
+}
+
+function render() {
+  const s = state;
+  const canGen = s.format && s.pain && s.hookType && s.selectedHook;
+  const combo = s.archFrom && s.archTo ? COMBOS.find(c => c.from === s.archFrom && c.to === s.archTo) : null;
+
+  let html = `
+    <div class="logo">FABU Creative</div>
+    <h1>Конструктор креативів</h1>
+    <p class="subtitle">Збери сторіборд з перевірених модулів вінерів · 7 топових креативів · $63-72 CPA</p>
+
+    <div class="section">
+      <span class="label">1. Платформа</span>
+      <div class="grid">
+        ${PLACEMENTS.map(p => `<button class="chip ${s.placement===p.id?'sel-purple':''}" onclick="set('placement','${p.id}')"><strong>${p.name}</strong><div class="chip-sub">${p.dur} · Хук: ${p.hook}</div></button>`).join('')}
+      </div>
+    </div>
+
+    <div class="section">
+      <span class="label">2. Формат</span>
+      <div class="grid">
+        ${FORMATS.map(f => `<button class="chip ${s.format===f.id?'sel-purple':''}" onclick="toggle('format','${f.id}')">${f.icon} <strong>${f.name}</strong> ${'⭐'.repeat(f.rating)}<div class="chip-sub">${f.desc}</div></button>`).join('')}
+      </div>
+    </div>
+
+    <div class="section">
+      <span class="label">3. Pain angle</span>
+      <div class="grid">
+        ${PAINS.map(p => `<button class="chip ${s.pain===p.id?'sel-red':''}" onclick="toggle('pain','${p.id}')">${p.emoji} ${p.name}</button>`).join('')}
+      </div>
+    </div>
+
+    <div class="section">
+      <span class="label">4. Архетип "Я є X, але жила як Y" (опційно)</span>
+      <div class="arch-row">
+        <div class="arch-col">
+          <div class="arch-label">Я є (правильний):</div>
+          <div class="grid">${ARCHETYPES.map(a => `<button class="chip ${s.archFrom===a.id?'sel-green':''}" onclick="toggle('archFrom','${a.id}')">${a.name}</button>`).join('')}</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-col">
+          <div class="arch-label">Але жила як (неправильний):</div>
+          <div class="grid">${ARCHETYPES.map(a => `<button class="chip ${s.archTo===a.id?'sel-danger':''}" onclick="toggle('archTo','${a.id}')">${a.name}</button>`).join('')}</div>
+        </div>
+      </div>
+      ${s.archFrom && s.archTo ? (combo
+        ? `<div class="combo-note ${combo.st.includes('⬜') ? 'combo-orange' : 'combo-green'}">${combo.st} — ${combo.note}</div>`
+        : `<div class="combo-note combo-orange">⬜ Ця комбінація ще не відпрацьована — потенційна біла пляма</div>`) : ''}
+    </div>
+
+    <div class="section">
+      <span class="label">5. Тип хука</span>
+      <div class="grid">
+        ${Object.entries(HOOKS).map(([type, data]) => `<button class="chip ${s.hookType===type?'sel-yellow':''}" onclick="state.hookType='${type}'; state.selectedHook=HOOKS['${type}'].items[0]; state.showResult=false; render();">${data.label}</button>`).join('')}
+      </div>
+      ${s.hookType ? `
+        <div style="margin-top:14px">
+          <div class="arch-label">Вибери конкретний хук:</div>
+          <div class="col">
+            ${HOOKS[s.hookType].items.map((h,i) => `<button class="chip ${s.selectedHook===h?'sel-yellow':''}" onclick="state.selectedHook=this.dataset.h; state.showResult=false; render();" data-h="${h.replace(/"/g,'&quot;')}" style="font-size:13px">"${h}"</button>`).join('')}
+          </div>
+        </div>
+      ` : ''}
+    </div>
+
+    <div class="section">
+      <span class="label">6. End Card</span>
+      <div class="grid">
+        ${ENDCARDS.map(e => `<button class="chip ${s.endcard===e.id?'sel-blue':''}" onclick="set('endcard','${e.id}')"><strong>${e.name}</strong> <span style="font-size:11px">CTR ${e.ctr}</span><div class="chip-sub">${e.desc}</div></button>`).join('')}
+      </div>
+    </div>
+
+    <div class="section">
+      <span class="label">7. CTA</span>
+      <div class="col">
+        ${CTAS.map(c => `<button class="chip ${s.cta===c?'sel-teal':''}" onclick="set('cta','${c.replace(/'/g,"\\'")}')">"${c}"</button>`).join('')}
+      </div>
+    </div>
+
+    <button class="btn-generate ${canGen?'active':'disabled'}" onclick="${canGen ? "state.showResult=true; render();" : ''}">${canGen ? '⚡ Згенерувати сторіборд' : 'Вибери формат, pain і хук щоб продовжити'}</button>
+  `;
+
+  if (s.showResult && canGen) {
+    const sb = generateStoryboard();
+    const fmt = FORMATS.find(f => f.id === s.format);
+    const pn = PAINS.find(p => p.id === s.pain);
+    const pl = PLACEMENTS.find(p => p.id === s.placement);
+    const ec = ENDCARDS.find(e => e.id === s.endcard);
+    const isR = s.placement === "rewarded" || s.placement === "rewarded45";
+
+    html += `
+      <div class="storyboard">
+        <div class="sb-header">
+          <div>
+            <div class="sb-title">Сторіборд</div>
+            <div class="sb-meta">${fmt?.icon} ${fmt?.name} · ${pn?.emoji} ${pn?.name} · ${pl?.name} (${pl?.dur})</div>
+          </div>
+          <button class="btn-copy" id="copyBtn" onclick="copyStoryboard()">📋 Копіювати бриф</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="sb-table">
+            <thead><tr><th>#</th><th>Блок</th><th>Час</th><th>VO (англійська)</th><th>Що в кадрі</th><th>Звук</th></tr></thead>
+            <tbody>
+              ${sb.map((r,i) => `<tr class="${r.cls}"><td class="td-num">${i+1}</td><td class="td-block">${r.block}</td><td class="td-time">${r.time}</td><td class="td-vo">${r.vo}</td><td class="td-visual">${r.visual}</td><td class="td-sound">${r.sound}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+        <div class="endcard-bar">
+          <div class="endcard-label">END CARD</div>
+          <div style="font-size:13px">${ec?.name} — ${ec?.desc}</div>
+        </div>
+        <div class="checklist-bar">
+          <strong>Чеклист:</strong> 9:16, .mp4, ≤2MB · Субтитри burn-in · CTA вбудований в кадр · End card обов'язковий · ${isR ? 'Хук у фіналі — найяскравіший кадр останній · Не зупиняти слабкі креативи — AXON сам' : 'Хук у перші 3 сек — thumb-stop · Sound-off дефолт — subtitle-first'}
+        </div>
+      </div>
+    `;
+  }
+
+  document.getElementById('app').innerHTML = html;
+}
+
+render();
+</script>
+</body>
+</html>
